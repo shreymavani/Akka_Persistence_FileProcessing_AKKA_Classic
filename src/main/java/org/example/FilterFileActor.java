@@ -13,6 +13,8 @@ import org.example.GetActor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FilterFileActor extends AbstractPersistentActor {
 
@@ -41,15 +43,34 @@ public class FilterFileActor extends AbstractPersistentActor {
     }
 
     private void filterFile(String data) {
+        data = stringFiltering(data,"Shrey");
         putFileActorRef.tell(data,getSelf());
+        String finalData = data;
         persist(new Tagged(data, Collections.singleton("filter-file")), evt -> {
             // Log successful persist event
             //getContext().getLog().info("File {} persisted successfully", file);
-            items.add(0, data);
+            items.add(0, finalData);
             if (items.size() > 5) {
                 items.remove(5);
             }
         });
+    }
+
+    public String stringFiltering(String inputData, String regex) {
+        String[] splitData = inputData.split("\n");
+        String filterData = "";
+//        System.out.println(splitData.length);
+        for (String line : splitData) {
+
+            Pattern pattern = Pattern.compile(regex);            // Compile the pattern
+
+            Matcher matcher = pattern.matcher(line);             // Replace the password with the string ""
+
+            filterData += (matcher.replaceAll("Kuldeep") + "\n");     // Replace the word "password" and password details with the string ""
+        }
+
+        return filterData;
+
     }
 
     @Override
