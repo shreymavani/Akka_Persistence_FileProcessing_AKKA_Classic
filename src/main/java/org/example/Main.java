@@ -7,10 +7,19 @@ package org.example;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
 public class Main {
     public static void main(String[] args) {
-        ActorSystem system = ActorSystem.create( "FileProcessingSystem");
+
+
+        Config regularConfig = ConfigFactory.load();
+        Config file = ConfigFactory.load("config.conf");
+        Config combined = file.withFallback(regularConfig);
+        Config complete = ConfigFactory.load(combined);
+
+        ActorSystem system = ActorSystem.create( "FileProcessingSystem",complete);
 
         ActorRef putfileActorRef =
                 system.actorOf(Props.create(PutFileActor.class,"/Users/smavani/INPUT_OUTPUT_FOR_TESTING/OUTPUT/output"), "persistentActor-4-java8");
